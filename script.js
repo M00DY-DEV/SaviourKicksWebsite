@@ -526,8 +526,6 @@ class Preloader {
         });
     }
 
-
-
     setupInternalLinks() {
         const internalLinks = document.querySelectorAll('.js-scroll-to');
         const smoother = this.smoother; // Grab the reference to the active smoother
@@ -733,7 +731,7 @@ class Preloader {
 
                 if (targetId === '#about-anchor' || targetId === '#about') {
                     // Update scroll target to match visual start where text is fully visible
-                    targetY = 2374;
+                    targetY = 2500;
                 } else {
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
