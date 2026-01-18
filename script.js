@@ -138,15 +138,37 @@ class Preloader {
         if (this.scrollIndicator) scrollTl.to(this.scrollIndicator, { bottom: stableHeight / 2, yPercent: 50, duration: 1, ease: "none", force3D: true }, 0);
 
         // --- UPDATED: WIDTH SET TO 80vw ---
-        if (this.sneakerImage) scrollTl.to(this.sneakerImage, {
-            height: '80vh',      // Match Yeezy/Tiffany Height
-            width: 'auto',       // allow aspect ratio scaling
-            maxWidth: '90%',     // Match Yeezy/Tiffany Max Width
-            opacity: 1,
-            duration: 1,
-            ease: "none",
-            force3D: true
-        }, 0);
+        if (this.sneakerImage) {
+            // --- SKILL: PREVENT SKEW ---
+            // 1. Get Aspect Ratio
+            const naturalW = this.sneakerImage.naturalWidth || 1000;
+            const naturalH = this.sneakerImage.naturalHeight || 600;
+            const aspectRatio = naturalW / naturalH;
+
+            // 2. Define Targets (Logic: Match Yeezy)
+            const targetH_vh = window.innerHeight * 0.8; // 80vh
+            const maxW_vw = window.innerWidth * 0.9;     // 90vw
+
+            // 3. Calculate Potential Width based on Height Target
+            let finalH = targetH_vh;
+            let finalW = finalH * aspectRatio;
+
+            // 4. Constraint Check
+            if (finalW > maxW_vw) {
+                finalW = maxW_vw;
+                finalH = finalW / aspectRatio;
+            }
+
+            // 5. Animate to EXACT values
+            scrollTl.to(this.sneakerImage, {
+                width: finalW,
+                height: finalH,
+                opacity: 1,
+                duration: 1,
+                ease: "none",
+                force3D: true
+            }, 0);
+        }
 
         if (this.scrollTextContainer) scrollTl.to(this.scrollTextContainer, { filter: 'blur(10px)', opacity: 0, duration: 0.5, ease: "none", force3D: true }, 0);
         if (this.logoReveal) scrollTl.fromTo(this.logoReveal, { y: -100 }, { y: logoOffset, duration: 1, ease: "none", force3D: true }, 0);
