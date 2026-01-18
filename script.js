@@ -732,8 +732,8 @@ class Preloader {
                 let targetY = 0;
 
                 if (targetId === '#about-anchor' || targetId === '#about') {
-                    // Update scroll target to match the new visual start point
-                    targetY = 2200;
+                    // Update scroll target to match visual start where text is fully visible
+                    targetY = 2374;
                 } else {
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
