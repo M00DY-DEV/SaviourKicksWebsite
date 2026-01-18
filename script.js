@@ -139,7 +139,9 @@ class Preloader {
 
         // --- UPDATED: WIDTH SET TO 80vw ---
         if (this.sneakerImage) scrollTl.to(this.sneakerImage, {
-            width: '80vw', // Changed to 80% viewport width
+            height: '80vh',      // Match Yeezy/Tiffany Height
+            width: 'auto',       // allow aspect ratio scaling
+            maxWidth: '90%',     // Match Yeezy/Tiffany Max Width
             opacity: 1,
             duration: 1,
             ease: "none",
