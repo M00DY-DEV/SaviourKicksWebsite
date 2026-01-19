@@ -527,10 +527,80 @@ class Preloader {
         aboutTl.to(textHowTo, { opacity: 1, filter: "blur(0px)", duration: fadePx, ease: "power2.out" }, ">");
         aboutTl.to({}, { duration: holdPx + fadePx });
 
-        // 7. GRAND EXIT
-        // Target textHowTo since it's the last one visible
-        aboutTl.to([headerContainer, textHowTo], { filter: 'blur(20px)', opacity: 0, scale: 1.1, duration: exitPx, ease: "power2.in" });
-        aboutTl.to(aboutContent, { y: -100, autoAlpha: 0, duration: exitPx, ease: "power2.in" }, "<");
+        // 7. TRANSITION: CARD EXITS LEFT, GALLERY ENTERS RIGHT
+        // Duration: slideDuration
+        const slideDuration = 800;
+
+        // Push old card + text left
+        aboutTl.to([aboutContent, headerContainer], {
+            x: -window.innerWidth,
+            autoAlpha: 0,
+            duration: slideDuration,
+            ease: "power2.inOut"
+        }, ">");
+
+        // Slide Gallery in from Right
+        const galleryGrid = document.querySelector('.about__gallery-grid');
+        const galleryImages = document.querySelectorAll('.about__gallery-img');
+
+        // Initial State for Gallery
+        gsap.set(galleryGrid, { x: window.innerWidth, autoAlpha: 1, visibility: 'visible' });
+
+        // Slide In
+        aboutTl.to(galleryGrid, {
+            x: 0,
+            duration: slideDuration,
+            ease: "power2.inOut"
+        }, "<");
+
+        // 8. HOLD GALLERY
+        const galleryHold = 2000; // Time to look at pictures
+        aboutTl.to({}, { duration: galleryHold });
+
+        // 9. GRAND EXIT (EXPLOSIVE SMOKE)
+        // We animate the GRID wrapper for opacity, but the IMAGES for the explosion.
+
+        // A: Fade wrapper
+        aboutTl.to(galleryGrid, {
+            opacity: 0,
+            duration: exitPx,
+            ease: "power2.in"
+        }, ">");
+
+        // B: Explode Images
+        // Logic: Calculate distance from center for each image to determine direction
+        galleryImages.forEach((img, i) => {
+            // Simple "scatter" logic based on index (0-8) in a 3x3 grid
+            // Grid positions:
+            // 0 1 2
+            // 3 4 5
+            // 6 7 8
+
+            // Calculate row/col (approximate)
+            const col = (i % 3) - 1; // -1, 0, 1 (Left, Center, Right)
+            const row = Math.floor(i / 3) - 1; // -1, 0, 1 (Top,  Mid, Bottom)
+
+            // Randomize slightly for chaos
+            const randomX = (Math.random() - 0.5) * 50;
+            const randomY = (Math.random() - 0.5) * 50;
+            const randomRot = (Math.random() - 0.5) * 90;
+
+            const xDir = (col * 300) + randomX; // Move horizontal
+            const yDir = (row * 300) + randomY; // Move vertical
+
+            // If it's the center image (4), send it Z-axis (Scale)
+            const scaleVal = i === 4 ? 3 : 0.5;
+
+            aboutTl.to(img, {
+                x: xDir,
+                y: yDir,
+                rotation: randomRot,
+                scale: scaleVal,
+                filter: 'blur(30px)', // The "Smoke"
+                duration: exitPx,
+                ease: "power2.in"
+            }, "<"); // Sync with wrapper fade
+        });
 
         // === C. IMAGE SEQUENCE SYNC ===
         let currentFrame = 0;
@@ -591,6 +661,7 @@ class Preloader {
             this.setupNavigation();
             this.setupInternalLinks();
             this.setupContactAnimations();
+            this.setupLightbox();
             ScrollTrigger.refresh();
         }, 100);
     }
@@ -817,6 +888,60 @@ class Preloader {
                     gsap.to(answer, { height: "auto", duration: 0.4, ease: "power2.inOut", onComplete: () => ScrollTrigger.refresh() });
                 }
             });
+        });
+    }
+
+    setupLightbox() {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = lightbox.querySelector('.lightbox__image');
+        const closeBtn = lightbox.querySelector('.lightbox__close');
+        const prevBtn = lightbox.querySelector('.lightbox__prev');
+        const nextBtn = lightbox.querySelector('.lightbox__next');
+        const galleryImages = document.querySelectorAll('.about__gallery-img');
+
+        let currentIndex = 0;
+
+        const openLightbox = (index) => {
+            currentIndex = index;
+            lightboxImg.src = galleryImages[currentIndex].src;
+            lightbox.classList.add('is-open');
+        };
+
+        const closeLightbox = () => {
+            lightbox.classList.remove('is-open');
+        };
+
+        const showNext = () => {
+            currentIndex = (currentIndex + 1) % galleryImages.length;
+            lightboxImg.src = galleryImages[currentIndex].src;
+        };
+
+        const showPrev = () => {
+            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+            lightboxImg.src = galleryImages[currentIndex].src;
+        };
+
+        galleryImages.forEach((img, index) => {
+            img.addEventListener('click', () => openLightbox(index));
+        });
+
+        if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+        if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showNext(); });
+        if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showPrev(); });
+
+        // Close on background click
+        if (lightbox) {
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+        }
+
+        // Keyboard nav
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox || !lightbox.classList.contains('is-open')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') showNext();
+            if (e.key === 'ArrowLeft') showPrev();
         });
     }
 
