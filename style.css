@@ -550,7 +550,7 @@ body {
     visibility: hidden;
     z-index: 199;
     /* Just below card so it can fly UNDER if needed, or above if preferred */
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .about__gallery-img {

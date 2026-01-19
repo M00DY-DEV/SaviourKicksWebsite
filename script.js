@@ -421,7 +421,7 @@ class Preloader {
             position: 'fixed', margin: 0,
             backgroundColor: "rgba(255, 255, 255, 0)",
             borderColor: "rgba(255, 255, 255, 0)",
-            backdropFilter: "blur(0px)", webkitBackdropFilter: "blur(0px)",
+            backdropFilter: "blur(0px)",
             boxShadow: "0 0 0 rgba(0,0,0,0)"
         });
 
@@ -491,7 +491,7 @@ class Preloader {
         aboutTl.to(aboutContent, {
             backgroundColor: "rgba(255, 255, 255, 0.4)",
             borderColor: "rgba(255, 255, 255, 0.8)",
-            backdropFilter: "blur(20px)", webkitBackdropFilter: "blur(20px)",
+            backdropFilter: "blur(20px)",
             boxShadow: "0 40px 80px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.5)",
             duration: glassDuration,
             ease: "none"
@@ -549,6 +549,8 @@ class Preloader {
         // Slide In
         aboutTl.to(galleryGrid, {
             x: 0,
+            autoAlpha: 1,
+            pointerEvents: 'auto',
             duration: slideDuration,
             ease: "power2.inOut"
         }, "<");
